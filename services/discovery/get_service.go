@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"go-backend-scaffold/config"
 	"log"
+	"strconv"
 
 	"github.com/hashicorp/consul/api"
 )
 
-func GetService(name string) *api.AgentService {
+func GetService(name string) string {
 	// 创建默认的配置
 	consulConfig := api.DefaultConfig()
 	consulConfig.Address = config.Consul.Address + ":8500"
@@ -26,6 +27,7 @@ func GetService(name string) *api.AgentService {
 	}
 
 	fmt.Println("已注册的服务列表:")
+	//TODO: 服务选择策略
 	for serviceName, service := range services {
 		fmt.Printf("服务名称: %s\n", serviceName)
 		fmt.Printf("服务ID: %s\n", service.ID)
@@ -33,6 +35,7 @@ func GetService(name string) *api.AgentService {
 		fmt.Printf("服务端口: %d\n", service.Port)
 		fmt.Printf("服务标签: %v\n", service.Tags)
 		fmt.Println("---------------------------")
+		return service.Address + ":" + strconv.Itoa(service.Port)
 	}
 
 	// 如果您想获取 Consul 目录中的所有服务，可以使用 Catalog API
@@ -47,5 +50,5 @@ func GetService(name string) *api.AgentService {
 		fmt.Printf("标签: %v\n", tags)
 		fmt.Println("---------------------------")
 	}
-	return nil
+	return "no service"
 }

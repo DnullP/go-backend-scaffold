@@ -5,7 +5,6 @@ import (
 	"context"
 	pb "go-backend-scaffold/proto"
 	"go-backend-scaffold/services/discovery"
-	"strconv"
 	"time"
 
 	"google.golang.org/grpc"
@@ -14,11 +13,9 @@ import (
 
 
 func GetCommentList(req *pb.GetCommentListRequest) (*pb.GetCommentListResponse, error) {
-	service := discovery.GetService("CommentService")
-	serviceAddress := service.Address
-	servicePort := service.Port
+	serviceAddress := discovery.GetService("CommentService")
 
-	conn, err := grpc.NewClient(serviceAddress+":"+strconv.Itoa(servicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(serviceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}

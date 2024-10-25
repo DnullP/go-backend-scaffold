@@ -1,24 +1,20 @@
-
 package client
 
 import (
 	"context"
 	pb "go-backend-scaffold/proto"
 	"go-backend-scaffold/services/discovery"
-	"strconv"
 	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-
 func GetUser(req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
-	service := discovery.GetService("UserService")
-	serviceAddress := service.Address
-	servicePort := service.Port
+	serviceAddress := discovery.GetService("UserService")
+	println(serviceAddress)
 
-	conn, err := grpc.NewClient(serviceAddress+":"+strconv.Itoa(servicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(serviceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -37,11 +33,9 @@ func GetUser(req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 }
 
 func Login(req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	service := discovery.GetService("UserService")
-	serviceAddress := service.Address
-	servicePort := service.Port
+	serviceAddress := discovery.GetService("UserService")
 
-	conn, err := grpc.NewClient(serviceAddress+":"+strconv.Itoa(servicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(serviceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -58,4 +52,3 @@ func Login(req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	}
 	return res, nil
 }
-

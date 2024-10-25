@@ -27,7 +27,7 @@ func RegisterService(serviceName string, serviceID string, servicePort int) erro
 
 	// 定义服务检查
 	check := &api.AgentServiceCheck{
-		HTTP:     fmt.Sprintf("http://%s:%d/health", hostIP, 8080),
+		HTTP:     fmt.Sprintf("http://%s:%d/health", hostIP, 8000),
 		Interval: "10s",
 		Timeout:  "1s",
 	}

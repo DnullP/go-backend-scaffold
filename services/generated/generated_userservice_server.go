@@ -64,7 +64,7 @@ func StartUserServiceServer(ctx context.Context, port string, handler UserServic
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("OK"))
 		})
-		if err := http.ListenAndServe(":8080", nil); err != nil {
+		if err := http.ListenAndServe(":8000", nil); err != nil {
 			log.Fatalf("无法启动健康检查 HTTP 服务器: %v", err)
 		}
 	}()
