@@ -9,8 +9,10 @@ import (
 
 var config struct {
 	Consul ConsulConfig `yaml:"consul"`
+	Jaeger JaegerConfig `yaml:"jaeger"`
 }
 var Consul ConsulConfig
+var Jaeger JaegerConfig
 
 func LoadConfig() {
 	// 读取 YAML 文件
@@ -25,6 +27,7 @@ func LoadConfig() {
 	err = yaml.Unmarshal(data, &config)
 
 	Consul = config.Consul
+	Jaeger = config.Jaeger
 
 	if err != nil {
 		log.Fatalf("无法解析 YAML: %v", err)

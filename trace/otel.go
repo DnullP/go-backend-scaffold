@@ -2,6 +2,7 @@ package trace
 
 import (
 	"context"
+	"go-backend-scaffold/config"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -17,7 +18,7 @@ var Tracer trace2.Tracer
 
 func SetTraceProvider(name string) (*trace.TracerProvider, error) {
 	client := otlptracegrpc.NewClient(
-		otlptracegrpc.WithEndpoint("localhost:4317"),
+		otlptracegrpc.WithEndpoint(config.Jaeger.Address+":4317"),
 		otlptracegrpc.WithInsecure(),
 	)
 	exporter, err := otlptrace.New(context.Background(), client)

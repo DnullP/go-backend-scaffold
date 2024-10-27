@@ -2,7 +2,10 @@ module go-backend-scaffold
 
 go 1.23.1
 
-require github.com/emicklei/proto v1.13.2
+require (
+	github.com/emicklei/proto v1.13.2
+	gopkg.in/yaml.v3 v3.0.1
+)
 
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
@@ -48,7 +51,6 @@ require (
 	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241007155032-5fefd90f89a9 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (

@@ -1,3 +1,4 @@
 consul:
   address: localhost
-  
+jaeger:
+  address: localhost
