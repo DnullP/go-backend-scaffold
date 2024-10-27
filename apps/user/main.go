@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"go-backend-scaffold/config"
+	"go-backend-scaffold/init_service"
 	"go-backend-scaffold/services"
 	"os/signal"
 	"syscall"
@@ -11,7 +11,6 @@ import (
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
-
-	config.LoadConfig()
+	init_service.InitServiceManage(ctx)
 	services.StartUserServiceServer(ctx, "5004")
 }

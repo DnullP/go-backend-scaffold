@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"go-backend-scaffold/config"
 	"go-backend-scaffold/proto"
 	"go-backend-scaffold/services/client"
@@ -20,7 +21,10 @@ func main() {
 			Id: 123,
 		}
 
-		res, _ := client.GetUser(&req)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		res, _ := client.GetUser(ctx, &req)
 		c.JSON(http.StatusOK, gin.H{
 			"name":  res.Name,
 			"email": res.Email,

@@ -113,13 +113,17 @@ import (
 	"strconv"
 
 	"go-backend-scaffold/config"
-	pb "go-backend-scaffold/proto" // 替换为实际路径
+	pb "go-backend-scaffold/proto"
 	"go-backend-scaffold/services/discovery"
+	"go-backend-scaffold/services/metadata"
+	"go-backend-scaffold/trace"
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/consul/api"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 )
+
 
 // {{.ServiceName}}Server 是服务接口，用户需要实现这个接口
 type {{.ServiceName}}Server interface {
@@ -137,9 +141,11 @@ type {{.ServiceName}}Implement struct {
 {{range .Methods}}
 // {{.MethodName}} 实现了 {{$.ServiceName}} 的 {{.MethodName}} 方法
 func (s *{{$.ServiceName}}Implement) {{.MethodName}}(ctx context.Context, req *pb.{{.RequestType}}) (*pb.{{.ResponseType}}, error) {
+	ctx = metadata.InjectMetadataIntoContext(ctx, req.Metadata)
     return s.Handler.{{.MethodName}}(ctx, req)
 }
 {{end}}
+
 
 // Start{{.ServiceName}}Server 启动 gRPC 服务器
 func Start{{.ServiceName}}Server(ctx context.Context, port string, handler {{.ServiceName}}Server) error {
@@ -149,8 +155,10 @@ func Start{{.ServiceName}}Server(ctx context.Context, port string, handler {{.Se
         return fmt.Errorf("failed to listen: %v", err)
     }
 
+	trace.SetTraceProvider("{{.ServiceName}}")
+
 	//创建grpc服务器
-    grpcServer := grpc.NewServer()
+    grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
     pb.Register{{.ServiceName}}Server(grpcServer, &{{.ServiceName}}Implement{Handler: handler})
 
 	//创建健康检查服务
@@ -161,7 +169,7 @@ func Start{{.ServiceName}}Server(ctx context.Context, port string, handler {{.Se
 			w.Write([]byte("OK"))
 		})
 		if err := http.ListenAndServe(":8000", nil); err != nil {
-			log.Fatalf("无法启动健康检查 HTTP 服务器: %v", err)
+			log.Printf("无法启动健康检查 HTTP 服务器: %v", err)
 		}
 	}()
 
@@ -243,7 +251,7 @@ type {{.ServiceName}} struct {
 }
 
 {{range .Methods}}
-func (u {{$.ServiceName}}) {{.MethodName}}(context.Context, *pb.{{.RequestType}}) (*pb.{{.ResponseType}}, error) {
+func (u {{$.ServiceName}}) {{.MethodName}}(ctx context.Context, req *pb.{{.RequestType}}) (*pb.{{.ResponseType}}, error) {
 	//complete this function
 	return &pb.{{.ResponseType}}{}, nil
 }
@@ -288,17 +296,20 @@ import (
 	"context"
 	pb "go-backend-scaffold/proto"
 	"go-backend-scaffold/services/discovery"
-	"time"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"go-backend-scaffold/services/metadata"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+
 )
 
+
 {{range .Methods}}
-func {{.MethodName}}(req *pb.{{.RequestType}}) (*pb.{{.ResponseType}}, error) {
+func {{.MethodName}}(ctx context.Context, req *pb.{{.RequestType}}) (*pb.{{.ResponseType}}, error) {
 	serviceAddress := discovery.GetService("{{$.ServiceName}}")
 
-	conn, err := grpc.NewClient(serviceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(serviceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()),
+				 				grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
 	if err != nil {
 		panic(err)
 	}
@@ -306,9 +317,7 @@ func {{.MethodName}}(req *pb.{{.RequestType}}) (*pb.{{.ResponseType}}, error) {
 
 	c := pb.New{{$.ServiceName}}Client(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
+	req.Metadata = metadata.ExtractMetadataFromContext(ctx)
 	res, err := c.{{.MethodName}}(ctx, req)
 	if err != nil {
 		panic(err)

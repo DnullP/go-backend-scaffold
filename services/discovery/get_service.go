@@ -21,21 +21,19 @@ func GetService(name string) string {
 	}
 
 	// 使用 Agent API 获取已注册的服务
-	services, err := client.Agent().Services()
+	services, _, err := client.Health().Service(name, "", true, &api.QueryOptions{})
 	if err != nil {
 		log.Fatalf("无法获取服务列表: %v", err)
 	}
 
 	fmt.Println("已注册的服务列表:")
 	//TODO: 服务选择策略
-	for serviceName, service := range services {
-		fmt.Printf("服务名称: %s\n", serviceName)
-		fmt.Printf("服务ID: %s\n", service.ID)
-		fmt.Printf("服务地址: %s\n", service.Address)
-		fmt.Printf("服务端口: %d\n", service.Port)
-		fmt.Printf("服务标签: %v\n", service.Tags)
+	for _, service := range services {
+		fmt.Printf("服务ID: %s\n", service.Service.ID)
+		fmt.Printf("服务地址: %s\n", service.Service.Address)
+		fmt.Printf("服务端口: %d\n", service.Service.Port)
 		fmt.Println("---------------------------")
-		return service.Address + ":" + strconv.Itoa(service.Port)
+		return service.Service.Address + ":" + strconv.Itoa(service.Service.Port)
 	}
 
 	// 如果您想获取 Consul 目录中的所有服务，可以使用 Catalog API

@@ -14,7 +14,7 @@ var Consul ConsulConfig
 
 func LoadConfig() {
 	// 读取 YAML 文件
-	data, err := os.ReadFile("config/common-config.yaml")
+	data, err := os.ReadFile("/home/go-backend-scaffold/config/common-config.yaml")
 	if err != nil {
 		log.Fatalf("无法读取配置文件: %v", err)
 	}

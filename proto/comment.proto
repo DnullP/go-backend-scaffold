@@ -4,10 +4,12 @@ option go_package = "/proto";
 
 message GetCommentListRequest {
   int32 video_id = 1;
+  map<string, string> metadata = 2;
 }
 
 message GetCommentListResponse {
   string list_data = 1;
+  map<string, string> metadata = 2;
 }
 
 service CommentService {
