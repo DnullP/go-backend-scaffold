@@ -115,7 +115,6 @@ import (
 	"go-backend-scaffold/config"
 	pb "go-backend-scaffold/proto"
 	"go-backend-scaffold/services/discovery"
-	"go-backend-scaffold/services/metadata"
 	"go-backend-scaffold/trace"
 
 	"github.com/google/uuid"
@@ -141,7 +140,6 @@ type {{.ServiceName}}Implement struct {
 {{range .Methods}}
 // {{.MethodName}} 实现了 {{$.ServiceName}} 的 {{.MethodName}} 方法
 func (s *{{$.ServiceName}}Implement) {{.MethodName}}(ctx context.Context, req *pb.{{.RequestType}}) (*pb.{{.ResponseType}}, error) {
-	ctx = metadata.InjectMetadataIntoContext(ctx, req.Metadata)
     return s.Handler.{{.MethodName}}(ctx, req)
 }
 {{end}}
@@ -298,7 +296,6 @@ import (
 	"go-backend-scaffold/services/discovery"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"go-backend-scaffold/services/metadata"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 
 )
@@ -317,7 +314,6 @@ func {{.MethodName}}(ctx context.Context, req *pb.{{.RequestType}}) (*pb.{{.Resp
 
 	c := pb.New{{$.ServiceName}}Client(conn)
 
-	req.Metadata = metadata.ExtractMetadataFromContext(ctx)
 	res, err := c.{{.MethodName}}(ctx, req)
 	if err != nil {
 		panic(err)
