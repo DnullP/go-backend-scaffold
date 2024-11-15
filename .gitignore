@@ -1,4 +1,5 @@
 *pb.go
 *Client.go
 generated*
+!generated*/
 *service.go
