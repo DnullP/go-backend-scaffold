@@ -10,12 +10,8 @@ import (
 )
 
 func GetService(name string) string {
-	// 创建默认的配置
-	consulConfig := api.DefaultConfig()
-	consulConfig.Address = config.Consul.Address + ":8500"
-
 	// 初始化 Consul 客户端
-	client, err := api.NewClient(consulConfig)
+	client, err := api.NewClient(config.Consul)
 	if err != nil {
 		log.Fatalf("无法创建 Consul 客户端: %v", err)
 	}

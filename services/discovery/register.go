@@ -10,11 +10,7 @@ import (
 )
 
 func RegisterService(serviceName string, serviceID string, servicePort int) error {
-	// 创建 Consul 客户端配置
-	consulConfig := api.DefaultConfig()
-	consulConfig.Address = config.Consul.Address + ":8500"
-
-	client, err := api.NewClient(consulConfig)
+	client, err := api.NewClient(config.Consul)
 	if err != nil {
 		return err
 	}

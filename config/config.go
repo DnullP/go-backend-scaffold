@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/hashicorp/consul/api"
 	"gopkg.in/yaml.v3"
 )
 
@@ -11,7 +12,7 @@ var config struct {
 	Consul ConsulConfig `yaml:"consul"`
 	Jaeger JaegerConfig `yaml:"jaeger"`
 }
-var Consul ConsulConfig
+var Consul *api.Config
 var Jaeger JaegerConfig
 
 func LoadConfig() {
@@ -26,7 +27,9 @@ func LoadConfig() {
 	// 解析 YAML 内容到结构体
 	err = yaml.Unmarshal(data, &config)
 
-	Consul = config.Consul
+	Consul = api.DefaultConfig()
+	Consul.Address = config.Consul.Address + ":8500"
+
 	Jaeger = config.Jaeger
 
 	if err != nil {
