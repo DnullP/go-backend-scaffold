@@ -222,25 +222,14 @@ package client
 import (
 	"context"
 	pb "go-backend-scaffold/proto"
-	"go-backend-scaffold/services/discovery"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-
 )
-
 
 {{range .Methods}}
 func {{.MethodName}}(ctx context.Context, req *pb.{{.RequestType}}) (*pb.{{.ResponseType}}, error) {
-	serviceAddress := discovery.GetService("{{$.ServiceName}}")
-
-	conn, err := grpc.NewClient(serviceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()),
-				 				grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
-
+	connCtx := context.Background()
+	conn := clientRequest(connCtx, "CommentService")
+	defer connCtx.Done()
+	
 	c := pb.New{{$.ServiceName}}Client(conn)
 
 	res, err := c.{{.MethodName}}(ctx, req)
@@ -257,7 +246,7 @@ func {{.MethodName}}(ctx context.Context, req *pb.{{.RequestType}}) (*pb.{{.Resp
 	}
 
 	// 创建输出目录和文件
-	outputDir := "services/client"
+	outputDir := "services/generated/client"
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
 		os.Mkdir(outputDir, os.ModePerm)
 	}

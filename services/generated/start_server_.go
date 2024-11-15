@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go-backend-scaffold/config"
-	"go-backend-scaffold/services/discovery"
+	"go-backend-scaffold/services/generated/discovery"
 	"go-backend-scaffold/trace"
 	"log"
 	"net"
